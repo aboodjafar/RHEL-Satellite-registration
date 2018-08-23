@@ -1,0 +1,22 @@
+---
+- hosts: hostname 
+  become: yes
+  tasks:
+   - name: Get the SSL certificate
+     get_url:
+       url: https://satelliteserverFQDN/pub/RHN-ORG-TRUSTED-SSL-CERT
+       dest: /usr/share/rhn
+       validate_certs: False
+     tags: register
+
+   - name: Add an entry in up2date file
+     lineinfile:
+        path: /etc/sysconfig/rhn/up2date
+        regexp: '^serverURL'
+        line: 'serverURL=https://satelliteserverFQDN/XMLRPC'
+        state: present
+     tags: register
+
+   - name: Register the Server
+     shell: rhnreg_ks --username=xxxx --password=xxxx --force
+     tags: register
